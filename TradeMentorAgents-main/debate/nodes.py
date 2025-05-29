@@ -4,9 +4,9 @@ import re
 from crewai import Crew, Process, Task, Agent
 from copy import deepcopy
 
-from crew.state import State, get_sample_news
-from crew.agents import bullish_researcher, bearish_researcher, trader_agent
-from crew.tasks import TradingTasks
+from debate.state import State, get_sample_inputs
+from debate.agents import bullish_researcher, bearish_researcher, trader_agent
+from debate.tasks import TradingTasks
 
 class Nodes:
     def __init__(self, debug: bool = False):
@@ -54,7 +54,22 @@ class Nodes:
             
         return result
     
-    def prepare_news(self, state: State) -> State:
+    # def prepare_news(self, state: State) -> State:
+    #     """准备新闻数据，如果没有则使用样例新闻
+        
+    #     Args:
+    #         state: 当前状态
+            
+    #     Returns:
+    #         更新后的状态
+    #     """
+    #     if not state["news"]:
+    #         if self.debug:
+    #             print("使用样例新闻进行分析")
+    #         state["news"] = get_sample_news()['content']
+        
+    #     return state
+    def prepare_inputs(self, state: State) -> State:
         """准备新闻数据，如果没有则使用样例新闻
         
         Args:
@@ -63,10 +78,11 @@ class Nodes:
         Returns:
             更新后的状态
         """
-        if not state["news"]:
+        # print(state)
+        if not state["inputs"]:
             if self.debug:
-                print("使用样例新闻进行分析")
-            state["news"] = get_sample_news()['content']
+                print("使用样例输入进行分析")
+            state["inputs"] = get_sample_inputs()
         
         return state
     
@@ -85,7 +101,8 @@ class Nodes:
         if self.debug:
             print(f"执行第 {current_round + 1} 轮分析...")
             
-        news_content = state["news"]
+        # news_content = state["news"]
+        inputs = state["inputs"]
         
         # 第一步：运行看多分析
         # 获取前轮分析（如果有）
@@ -95,7 +112,7 @@ class Nodes:
             
         # 创建看多任务
         bullish_task = self.tasks.bullish_analysis_task(
-            news_content=news_content,
+            inputs=inputs,
             previous_round=current_round if current_round > 0 else None,
             bearish_analysis=previous_bearish
         )
@@ -109,7 +126,7 @@ class Nodes:
         # 第二步：运行看空分析
         # 创建看空任务
         bearish_task = self.tasks.bearish_analysis_task(
-            news_content=news_content,
+            inputs=inputs,
             previous_round=current_round if current_round > 0 else None,
             bullish_analysis=bullish_result  # 使用刚生成的看多分析
         )
@@ -123,7 +140,7 @@ class Nodes:
         # 第三步：运行交易决策
         # 创建交易决策任务
         trader_task = self.tasks.trader_decision_task(
-            news_content=news_content,
+            inputs=inputs,
             previous_round=current_round if current_round > 0 else None,
             bullish_analysis=bullish_result,
             bearish_analysis=bearish_result

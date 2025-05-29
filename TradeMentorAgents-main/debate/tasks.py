@@ -1,13 +1,13 @@
 from crewai import Task
-from crew.agents import bullish_researcher, bearish_researcher, trader_agent
+from debate.agents import bullish_researcher, bearish_researcher, trader_agent
 from textwrap import dedent
 
 class TradingTasks:
-    def bullish_analysis_task(self, news_content=None, previous_round=None, bearish_analysis=None):
+    def bullish_analysis_task(self, inputs=None, previous_round=None, bearish_analysis=None):
         """创建看多分析任务
         
         Args:
-            news_content: 新闻内容
+            inputs: 输入数据
             previous_round: 前一轮次号码（如果有）
             bearish_analysis: 前一轮看空分析（如果有）
             
@@ -15,12 +15,12 @@ class TradingTasks:
             配置好的Task对象
         """
         description = dedent(f"""
-            Analyze the news content and identify all bullish signals that suggest buying. 
+            Analyze the inputs content and identify all bullish signals that suggest buying. 
             Focus on growth potential, positive indicators, and favorable market conditions.
             Then, counter any bearish arguments with solid reasoning.
             
-            Here is the news content to analyze:
-            {news_content or "[No news content provided]"}
+            Here is the inputs to analyze:
+            {inputs}
             """)
             
         # 如果有前一轮分析，添加相关内容
@@ -36,7 +36,7 @@ class TradingTasks:
         description += dedent("""
             
             Your analysis should cover:
-            1. Key bullish signals in the news
+            1. Key bullish signals in the inputs
             2. Historical precedents that support your view
             3. Potential catalysts for upside
             4. Valuation considerations that support buying
@@ -60,14 +60,14 @@ class TradingTasks:
             description=description,
             expected_output="A structured bullish analysis highlighting buying opportunities with strong counters to bearish arguments",
             agent=bullish_researcher,
-            output_file="bullish_analysis.txt",
+            output_file="debate/output/bullish_analysis.txt",
         )
     
-    def bearish_analysis_task(self, news_content=None, previous_round=None, bullish_analysis=None):
+    def bearish_analysis_task(self, inputs=None, previous_round=None, bullish_analysis=None):
         """创建看空分析任务
         
         Args:
-            news_content: 新闻内容
+            inputs: 输入数据
             previous_round: 前一轮次号码（如果有）
             bullish_analysis: 前一轮看多分析（如果有）
             
@@ -75,12 +75,12 @@ class TradingTasks:
             配置好的Task对象
         """
         description = dedent(f"""
-            Analyze the news content and identify all bearish signals that suggest caution or selling.
+            Analyze the inputs content and identify all bearish signals that suggest caution or selling.
             Focus on risks, negative indicators, and unfavorable market conditions.
             Then, counter any bullish arguments with solid reasoning.
             
-            Here is the news content to analyze:
-            {news_content or "[No news content provided]"}
+            Here is the inputs content to analyze:
+            {inputs}
             """)
             
         # 如果有前一轮分析，添加相关内容
@@ -96,7 +96,7 @@ class TradingTasks:
         description += dedent("""
             
             Your analysis should cover:
-            1. Key risk factors in the news
+            1. Key risk factors in the inputs
             2. Historical precedents that support your cautious view
             3. Potential catalysts for downside
             4. Valuation considerations that suggest overvaluation
@@ -120,14 +120,14 @@ class TradingTasks:
             description=description,
             expected_output="A structured bearish analysis highlighting risks with strong counters to bullish arguments",
             agent=bearish_researcher,
-            output_file="bearish_analysis.txt",
+            output_file="debate/output/bearish_analysis.txt",
         )
     
-    def trader_decision_task(self, news_content=None, previous_round=None, bullish_analysis=None, bearish_analysis=None):
+    def trader_decision_task(self, inputs=None, previous_round=None, bullish_analysis=None, bearish_analysis=None):
         """创建交易决策任务
         
         Args:
-            news_content: 新闻内容
+            inputs: 输入数据
             previous_round: 前一轮次号码（如果有）
             bullish_analysis: 看多分析（如果有）
             bearish_analysis: 看空分析（如果有）
@@ -138,8 +138,8 @@ class TradingTasks:
         description = dedent(f"""
             Evaluate the debate between bullish and bearish researchers and make a trading decision.
             
-            Here is the news content that was analyzed:
-            {news_content or "[No news content provided]"}
+            Here is the inputs content that was analyzed:
+            {inputs}
             """)
             
         # 添加轮次信息（如果有）
@@ -206,7 +206,7 @@ class TradingTasks:
             description=description,
             expected_output="A structured decision with numeric score, clear rationale, and specific action recommendation",
             agent=trader_agent,
-            output_file="trader_decision.txt",
+            output_file="debate/output/trader_decision.txt",
         )
 
 

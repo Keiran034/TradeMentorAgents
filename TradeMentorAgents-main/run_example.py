@@ -3,23 +3,25 @@
 import os
 import sys
 import json
-from crew.graph import TradingWorkflow
-
+from debate.graph import TradingWorkflow
+from debate.state import initialize_state, get_sample_inputs
 def main():
     # 设置日志等级
     debug = "--debug" in sys.argv
     
-    # 如果提供了新闻文件路径，读取新闻内容
-    news_text = None
-    if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
-        news_file = sys.argv[1]
-        try:
-            with open(news_file, "r", encoding="utf-8") as f:
-                news_text = f.read()
-            print(f"读取到新闻内容，长度: {len(news_text)} 字符")
-        except Exception as e:
-            print(f"读取新闻文件时出错: {e}")
-            sys.exit(1)
+    # # 如果提供了新闻文件路径，读取新闻内容
+    # news_text = None
+    # if len(sys.argv) > 1 and not sys.argv[1].startswith("--"):
+    #     news_file = sys.argv[1]
+    #     try:
+    #         with open(news_file, "r", encoding="utf-8") as f:
+    #             news_text = f.read()
+    #         print(f"读取到新闻内容，长度: {len(news_text)} 字符")
+    #     except Exception as e:
+    #         print(f"读取新闻文件时出错: {e}")
+    #         sys.exit(1)
+
+    inputs = get_sample_inputs()
     
     # 设置最大回合数
     max_rounds = 4  # 默认4轮
@@ -37,13 +39,7 @@ def main():
     workflow = TradingWorkflow(debug=debug, max_rounds=max_rounds)
     
     # 准备初始状态
-    initial_state = {
-        "news": news_text if news_text else "",
-        "analyses": [],
-        "trader_scores": [],
-        "debate_rounds": [],
-        "decision": None
-    }
+    initial_state = initialize_state(inputs)
     
     # 运行工作流
     result = workflow.app.invoke(initial_state)

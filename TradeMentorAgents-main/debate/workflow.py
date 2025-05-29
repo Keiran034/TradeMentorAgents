@@ -6,9 +6,9 @@ from copy import deepcopy
 from crewai import Crew, Process, Task
 from langchain_openai import ChatOpenAI
 
-from crew.state import State, initialize_state, get_sample_news
-from crew.agents import bullish_researcher, bearish_researcher, trader_agent
-from crew.tasks import bullish_analysis_task, bearish_analysis_task, trader_decision_task
+from debate.state import State, initialize_state, get_sample_news
+from debate.agents import bullish_researcher, bearish_researcher, trader_agent
+from debate.tasks import bullish_analysis_task, bearish_analysis_task, trader_decision_task
 
 class TradingWorkflow:
     def __init__(
