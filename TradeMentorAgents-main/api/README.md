@@ -1,6 +1,6 @@
 # Multi-Agents API
 
-这是 Multi-Agents 项目的 API 服务器。
+这是 Multi-Agents 项目的 API 服务器，用于提供智能交易分析和决策服务。
 
 ## 安装
 
@@ -25,60 +25,97 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 ## API 文档
 
-启动服务器后，可以访问以下地址查看 API 文档：
+启动服务器后，可以访问以下地址查看详细的 API 文档：
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-## 基础端点
+## API 端点说明
 
-- GET /: 欢迎页面
-- GET /health: 健康检查
-- GET /api/v1/debate/sample: 获取示例输入数据
-- POST /api/v1/debate: 运行 debate 工作流
-- POST /api/v1/debate/stream: 运行 debate 工作流（流式输出）
+### 基础端点
 
-### Debate 工作流端点
+- `GET /`: 欢迎页面
+- `GET /health`: 健康检查
+- `GET /api/v1/debate/sample`: 获取示例输入数据
+- `POST /api/v1/debate`: 运行 debate 工作流（同步响应）
+- `POST /api/v1/debate/stream`: 运行 debate 工作流（流式输出）
 
-#### POST /api/v1/debate
+### 输入数据格式
 
-运行 debate 工作流的端点。接受任意格式的输入数据，格式应与示例输入数据相似。
+API 接受的输入数据格式如下：
 
-示例请求：
+```json
+{
+    "request_id": "optional_request_id",
+    "data": [
+        {
+            "type": "news",
+            "date": "2024-03-20",
+            "data": {
+                "title": "新闻标题",
+                "content": "新闻内容"
+            }
+        }
+    ]
+}
+```
+
+### 使用示例
+
+#### 1. 获取示例输入数据
+
+```bash
+curl "http://localhost:8000/api/v1/debate/sample"
+```
+
+#### 2. 运行 Debate 工作流（同步）
+
 ```bash
 curl -X POST "http://localhost:8000/api/v1/debate" \
      -H "Content-Type: application/json" \
      -d '{
-       "inputs": [
+       "data": [
          {
            "type": "news",
-           "date": "2025-05-02",
+           "date": "2024-03-20",
            "data": {
-             "title": "示例新闻标题",
-             "content": "示例新闻内容"
+             "title": "市场分析新闻",
+             "content": "详细的市场分析内容..."
            }
          }
        ]
      }'
 ```
 
-#### POST /api/v1/debate/stream
+响应格式：
+```json
+{
+    "status": "success",
+    "message": "Debate workflow completed successfully",
+    "data": {
+        "inputs": [...],
+        "analyses": [...],
+        "trader_scores": [...],
+        "debate_rounds": [...],
+        "decision": "最终决策"
+    }
+}
+```
 
-运行 debate 工作流的流式端点。实时返回工作流的进展状态。
+#### 3. 运行 Debate 工作流（流式输出）
 
-示例请求：
 ```bash
 curl -X POST "http://localhost:8000/api/v1/debate/stream" \
      -H "Content-Type: application/json" \
      -H "Accept: text/event-stream" \
      -d '{
-       "inputs": [
+       "data": [
          {
            "type": "news",
-           "date": "2025-05-02",
+           "date": "2024-03-20",
            "data": {
-             "title": "示例新闻标题",
-             "content": "示例新闻内容"
+             "title": "市场分析新闻",
+             "content": "详细的市场分析内容..."
            }
          }
        ]
@@ -93,7 +130,6 @@ curl -X POST "http://localhost:8000/api/v1/debate/stream" \
 // 进度更新
 {"type": "progress", "round": 1, "total_rounds": 4, "latest_analysis": {...}}
 {"type": "progress", "round": 2, "total_rounds": 4, "latest_analysis": {...}}
-// ...
 
 // 最终结果
 {"type": "result", "data": {...}}
@@ -102,11 +138,23 @@ curl -X POST "http://localhost:8000/api/v1/debate/stream" \
 {"type": "error", "message": "错误信息"}
 ```
 
-#### GET /api/v1/debate/sample
+## 错误处理
 
-获取示例输入数据的端点，可用于了解正确的输入格式。
+API 使用标准的 HTTP 状态码进行错误响应：
 
-示例请求：
-```bash
-curl "http://localhost:8000/api/v1/debate/sample"
-``` 
+- 200: 请求成功
+- 400: 请求格式错误
+- 500: 服务器内部错误
+
+错误响应格式：
+```json
+{
+    "detail": "错误描述信息"
+}
+```
+
+## 注意事项
+
+1. 所有时间格式应使用 ISO 格式：YYYY-MM-DD
+2. 请确保输入数据的完整性和准确性
+3. 对于流式输出，请确保客户端支持 Server-Sent Events (SSE) 
