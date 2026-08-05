@@ -20,6 +20,7 @@ pip install -r requirements.txt
 ## 运行服务器
 
 ```bash
+cd api
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 

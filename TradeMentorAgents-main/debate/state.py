@@ -86,5 +86,9 @@ def get_sample_inputs() -> List[InputData]:
                     {"date": "2025-05-01", "close": 870.15, "volume": 24500000}
                 ]
             }
+        },
+        {
+            'debate_round': 2,
+            # 'stream_mode': 'updates'
         }
     ]

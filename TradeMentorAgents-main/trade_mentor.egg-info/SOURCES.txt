@@ -1,0 +1,13 @@
+README.md
+setup.py
+debate/__init__.py
+debate/agents.py
+debate/graph.py
+debate/nodes.py
+debate/state.py
+debate/tasks.py
+debate/workflow.py
+trade_mentor.egg-info/PKG-INFO
+trade_mentor.egg-info/SOURCES.txt
+trade_mentor.egg-info/dependency_links.txt
+trade_mentor.egg-info/top_level.txt
